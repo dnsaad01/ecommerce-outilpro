@@ -1,0 +1,81 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1920 1080" width="1920" height="1080" role="img" aria-label="Illustration d'outillage professionnel">
+  <defs>
+    <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0b1120"/>
+      <stop offset="55%" stop-color="#111827"/>
+      <stop offset="100%" stop-color="#1e293b"/>
+    </linearGradient>
+    <linearGradient id="steelV" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#cbd5e1"/>
+      <stop offset="100%" stop-color="#64748b"/>
+    </linearGradient>
+    <linearGradient id="steelH" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#94a3b8"/>
+      <stop offset="100%" stop-color="#475569"/>
+    </linearGradient>
+    <linearGradient id="steelDiag" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#e2e8f0"/>
+      <stop offset="100%" stop-color="#64748b"/>
+    </linearGradient>
+    <pattern id="diagLines" width="46" height="46" patternTransform="rotate(45)" patternUnits="userSpaceOnUse">
+      <line x1="0" y1="0" x2="0" y2="46" stroke="#ffffff" stroke-opacity="0.045" stroke-width="1"/>
+    </pattern>
+  </defs>
+
+  <rect width="1920" height="1080" fill="url(#bgGrad)"/>
+  <rect width="1920" height="1080" fill="url(#diagLines)"/>
+
+  <!-- boulons et ecrous disperses (centres sur la bande visible quel que soit le recadrage) -->
+  <g fill="#64748b" opacity="0.55">
+    <g transform="translate(120,700)">
+      <polygon points="30,0 55,15 55,45 30,60 5,45 5,15" fill="url(#steelDiag)"/>
+      <circle cx="30" cy="30" r="12" fill="#0b1120"/>
+    </g>
+    <g transform="translate(1750,380) scale(0.7)">
+      <polygon points="30,0 55,15 55,45 30,60 5,45 5,15" fill="url(#steelDiag)"/>
+      <circle cx="30" cy="30" r="12" fill="#0b1120"/>
+    </g>
+    <g transform="translate(870,330) scale(0.5)">
+      <polygon points="30,0 55,15 55,45 30,60 5,45 5,15" fill="url(#steelDiag)"/>
+      <circle cx="30" cy="30" r="12" fill="#0b1120"/>
+    </g>
+    <g transform="translate(1520,700) scale(0.85)">
+      <polygon points="30,0 55,15 55,45 30,60 5,45 5,15" fill="url(#steelDiag)"/>
+      <circle cx="30" cy="30" r="12" fill="#0b1120"/>
+    </g>
+  </g>
+
+  <!-- tournevis, en haut au centre, incline -->
+  <g transform="translate(760,280) rotate(35)">
+    <rect x="0" y="0" width="18" height="220" rx="9" fill="url(#steelV)"/>
+    <rect x="-16" y="200" width="50" height="130" rx="20" fill="#ea580c"/>
+    <rect x="-16" y="315" width="50" height="18" rx="9" fill="#c2410c"/>
+  </g>
+
+  <!-- cle plate / a molette, cote gauche -->
+  <g transform="translate(60,430) rotate(-18)">
+    <rect x="90" y="55" width="420" height="46" rx="23" fill="url(#steelH)"/>
+    <circle cx="70" cy="78" r="80" fill="url(#steelDiag)"/>
+    <circle cx="70" cy="78" r="34" fill="#0b1120"/>
+    <path d="M470,20 C560,20 590,60 590,78 C590,96 560,136 470,136 C452,136 440,120 444,101 L470,101 C500,101 512,90 512,78 C512,66 500,55 470,55 L444,55 C440,36 452,20 470,20 Z" fill="url(#steelDiag)"/>
+    <rect x="440" y="66" width="26" height="24" fill="#0b1120"/>
+  </g>
+
+  <!-- perceuse-visseuse, cote droit -->
+  <g transform="translate(1180,470) rotate(-6)">
+    <rect x="90" y="140" width="90" height="230" rx="24" fill="url(#steelV)" transform="rotate(18 90 140)"/>
+    <rect x="118" y="205" width="34" height="80" rx="14" fill="#ea580c" transform="rotate(18 90 140)"/>
+    <rect x="40" y="345" width="120" height="70" rx="16" fill="#c2410c" transform="rotate(18 90 140)"/>
+    <rect x="0" y="0" width="380" height="150" rx="34" fill="url(#steelDiag)"/>
+    <rect x="20" y="18" width="200" height="18" rx="9" fill="#e2e8f0" opacity="0.6"/>
+    <polygon points="380,30 470,55 470,95 380,120" fill="#334155"/>
+    <rect x="470" y="63" width="170" height="14" rx="6" fill="#cbd5e1"/>
+    <rect x="470" y="63" width="170" height="5" fill="#f1f5f9" opacity="0.6"/>
+  </g>
+
+  <!-- petit ecrou isole pres du titre pour equilibrer -->
+  <g transform="translate(980,650) scale(0.6)" opacity="0.4">
+    <polygon points="30,0 55,15 55,45 30,60 5,45 5,15" fill="url(#steelDiag)"/>
+    <circle cx="30" cy="30" r="12" fill="#0b1120"/>
+  </g>
+</svg>

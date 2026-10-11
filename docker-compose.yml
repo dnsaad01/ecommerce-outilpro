@@ -1,0 +1,30 @@
+version: '3.8'
+
+networks:
+  outilpro_network:
+    name: outilpro_network
+    driver: bridge
+
+volumes:
+  outilpro_postgres_data:
+    name: outilpro_postgres_data
+
+services:
+  db:
+    image: postgres:16-alpine
+    container_name: outilpro-postgres
+    environment:
+      POSTGRES_DB: outilpro
+      POSTGRES_USER: outilpro
+      POSTGRES_PASSWORD: outilpro
+    ports:
+      - "5435:5432"
+    volumes:
+      - outilpro_postgres_data:/var/lib/postgresql/data
+    networks:
+      - outilpro_network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U outilpro -d outilpro"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
