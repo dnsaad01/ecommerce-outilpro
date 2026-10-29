@@ -8,6 +8,17 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
+// Livraison toujours gratuite, sans frais selon la ville. La ville est tout de même
+// capturée (simple champ texte, pas d'entité/référentiel dédié) car l'admin en a besoin
+// pour savoir où expédier la commande.
+//
+// ville est volontairement NULLABLE côté base (contrairement aux autres champs obligatoires
+// ci-dessous) : le formulaire Checkout l'exige déjà (voir @NotBlank sur CommandeRequest.ville),
+// donc toute NOUVELLE commande a bien une ville -- mais une colonne NOT NULL sans valeur par
+// défaut ne peut pas être ajoutée par ddl-auto=update sur une table "commandes" qui contient
+// déjà des lignes (ALTER TABLE échoue silencieusement côté Postgres). Nullable ici correspond
+// aussi au fallback "Non renseignée" déjà prévu pour les anciennes commandes dans
+// CommandeRepository.repartitionParVille (COALESCE(c.ville, 'Non renseignée')).
 @Entity
 @Table(name = "commandes")
 @Getter
@@ -32,14 +43,8 @@ public class Commande {
     @Column(nullable = false, length = 500)
     private String adresseLivraison;
 
-    // Snapshot de la ville au moment de la commande
-    private Long villeId;
-
-    @Column(nullable = false)
-    private String villeNom;
-
-    @Column(nullable = false, precision = 10, scale = 2)
-    private BigDecimal fraisLivraison;
+    @Column(length = 100)
+    private String ville;
 
     @Column(nullable = false, precision = 10, scale = 2)
     private BigDecimal sousTotal;
@@ -54,9 +59,6 @@ public class Commande {
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private StatutCommande statut;
-
-    @Column(length = 1000)
-    private String notes;
 
     @Column(nullable = false)
     private LocalDateTime dateCreation;

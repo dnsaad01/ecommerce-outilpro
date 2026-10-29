@@ -11,12 +11,14 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
-// Non listé dans SecurityConfig -> protégé par défaut (anyRequest().authenticated()), donc admin only.
+// Gestion des stocks : réservée à ADMIN (pas dans le périmètre EMPLOYE).
 @RestController
 @RequestMapping("/api/stock")
 @RequiredArgsConstructor
+@PreAuthorize("hasRole('ADMIN')")
 public class StockController {
 
     private final StockService stockService;

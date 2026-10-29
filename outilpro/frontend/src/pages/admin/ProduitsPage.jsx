@@ -7,6 +7,7 @@ import ImageUploadField from '../../components/admin/ImageUploadField';
 import AjusterStockModal from '../../components/admin/AjusterStockModal';
 import { IconImageOff, IconX } from '../../components/admin/icons';
 import ActionButtons from '../../components/admin/ActionButtons';
+import { useAuth } from '../../context/AuthContext';
 
 const FORM_VIDE = {
     nom: '',
@@ -24,16 +25,15 @@ const FORM_VIDE = {
 // Toute la carte est cliquable (ouvre l'édition) ; "Supprimer" reste une action
 // isolée (icône discrète, visible au survol) pour ne jamais déclencher les deux à la fois.
 function CarteProduit({ produit, onModifier, onSupprimer, onAjusterStock }) {
+    const estEditable = Boolean(onModifier);
     return (
         <div
-            onClick={() => onModifier(produit)}
-            onKeyDown={(e) => {
-                if (e.key === 'Enter') onModifier(produit);
-            }}
-            role="button"
-            tabIndex={0}
-            title="Cliquer pour modifier ce produit"
-            className="group relative bg-white rounded-xl border border-gray-100 shadow-sm overflow-hidden cursor-pointer transition-all duration-200 hover:shadow-md hover:-translate-y-0.5 focus:outline-none focus:ring-2 focus:ring-orange-200"
+            onClick={estEditable ? () => onModifier(produit) : undefined}
+            onKeyDown={estEditable ? (e) => { if (e.key === 'Enter') onModifier(produit); } : undefined}
+            role={estEditable ? 'button' : undefined}
+            tabIndex={estEditable ? 0 : undefined}
+            title={estEditable ? 'Cliquer pour modifier ce produit' : undefined}
+            className={`group relative bg-white rounded-xl border border-gray-100 shadow-sm overflow-hidden transition-all duration-200 hover:shadow-md hover:-translate-y-0.5 focus:outline-none focus:ring-2 focus:ring-orange-200 ${estEditable ? 'cursor-pointer' : ''}`}
         >
             <div className="relative aspect-square bg-gray-50">
                 {produit.imageUrl ? (
@@ -50,11 +50,15 @@ function CarteProduit({ produit, onModifier, onSupprimer, onAjusterStock }) {
                     </span>
                 )}
 
+                {/* onXxx transmis seulement si fourni par le parent : pour un EMPLOYE (consultation
+                    seule), ProduitsPage passe onModifier/onSupprimer/onAjusterStock à undefined, et
+                    ces wrappers doivent rester undefined aussi -- sinon ActionButtons recevrait quand
+                    même une fonction "truthy" et afficherait des boutons qui planteraient au clic. */}
                 <ActionButtons
                     className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 focus-within:opacity-100 transition-opacity duration-150"
-                    onAjusterStock={() => onAjusterStock(produit)}
-                    onModifier={() => onModifier(produit)}
-                    onSupprimer={() => onSupprimer(produit)}
+                    onAjusterStock={onAjusterStock ? () => onAjusterStock(produit) : undefined}
+                    onModifier={onModifier ? () => onModifier(produit) : undefined}
+                    onSupprimer={onSupprimer ? () => onSupprimer(produit) : undefined}
                 />
             </div>
 
@@ -82,6 +86,7 @@ function CarteProduit({ produit, onModifier, onSupprimer, onAjusterStock }) {
 }
 
 function ProduitsPage() {
+    const { estAdmin } = useAuth();
     const [pageData, setPageData] = useState(null);
     const [page, setPage] = useState(0);
     const [rechercheInput, setRechercheInput] = useState('');
@@ -123,7 +128,7 @@ function ProduitsPage() {
     // (utilisé par le lien "Produits à réapprovisionner" de la page Statistiques).
     useEffect(() => {
         const idAEditer = searchParams.get('edit');
-        if (!idAEditer) return;
+        if (!idAEditer || !estAdmin) return;
         async function ouvrirDepuisLien() {
             try {
                 const produit = await produitApi.getById(idAEditer);
@@ -146,7 +151,7 @@ function ProduitsPage() {
     // Ouvre directement le formulaire de création si on arrive avec ?action=new
     // (utilisé par le raccourci "Nouveau produit" de la page Statistiques).
     useEffect(() => {
-        if (searchParams.get('action') !== 'new') return;
+        if (searchParams.get('action') !== 'new' || !estAdmin) return;
         ouvrirCreation();
         setSearchParams((params) => {
             const suivants = new URLSearchParams(params);
@@ -264,12 +269,18 @@ function ProduitsPage() {
         <div>
             <div className="flex items-center justify-between mb-6">
                 <h1 className="text-2xl font-bold text-gray-900">Produits</h1>
-                <button
-                    onClick={ouvrirCreation}
-                    className="bg-gray-900 text-white text-sm font-medium px-4 py-2 rounded hover:bg-gray-800"
-                >
-                    + Nouveau produit
-                </button>
+                {estAdmin ? (
+                    <button
+                        onClick={ouvrirCreation}
+                        className="bg-gray-900 text-white text-sm font-medium px-4 py-2 rounded hover:bg-gray-800"
+                    >
+                        + Nouveau produit
+                    </button>
+                ) : (
+                    <span className="text-xs font-medium text-gray-500 bg-gray-100 px-3 py-1.5 rounded-full">
+                        Consultation seule
+                    </span>
+                )}
             </div>
 
             <form onSubmit={soumettreRecherche} className="mb-4 flex gap-2">
@@ -446,9 +457,9 @@ function ProduitsPage() {
                             <CarteProduit
                                 key={produit.id}
                                 produit={produit}
-                                onModifier={ouvrirEdition}
-                                onSupprimer={supprimer}
-                                onAjusterStock={setProduitEnAjustement}
+                                onModifier={estAdmin ? ouvrirEdition : undefined}
+                                onSupprimer={estAdmin ? supprimer : undefined}
+                                onAjusterStock={estAdmin ? setProduitEnAjustement : undefined}
                             />
                         ))}
                     </div>

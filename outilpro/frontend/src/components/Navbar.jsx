@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useCart } from '../context/CartContext';
 import { useLanguage } from '../context/LanguageContext';
+import { Logo } from './Logo';
 
 function Navbar() {
     const { totalArticles } = useCart();
@@ -48,8 +49,8 @@ function Navbar() {
                     )}
                 </button>
 
-                <Link to="/" className="text-2xl font-bold text-gray-900 tracking-tight shrink-0">
-                    Outil<span className="text-orange-600">Pro</span>
+                <Link to="/" className="text-gray-900 shrink-0">
+                    <Logo />
                 </Link>
 
                 <nav className="hidden md:flex items-center gap-6 text-sm font-medium text-gray-700">

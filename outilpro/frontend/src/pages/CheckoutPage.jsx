@@ -1,49 +1,111 @@
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { Navigate, useNavigate } from 'react-router-dom';
 import { useCart } from '../context/CartContext';
 import { usePromoReduction } from '../hooks/usePromoReduction';
 import { useLanguage } from '../context/LanguageContext';
-import villeApi from '../api/villes';
 import commandeApi from '../api/commandes';
+
+// Liste fermée (triée par ordre alphabétique du nom français, pour un ordre stable quelle
+// que soit la langue d'affichage) des principales villes et préfectures du Maroc pour le
+// menu déroulant. "value" est le nom canonique (toujours en français) enregistré en base
+// -- quelle que soit la langue d'affichage du site, afin que la statistique "Ventes par
+// ville" ne soit pas fragmentée entre une saisie FR et une saisie AR de la même ville. Pas
+// d'entité ni de tarification de livraison associée : c'est une simple liste statique,
+// purement informative.
+const VILLES_MAROC = [
+    { value: 'Agadir', ar: 'أكادير' },
+    { value: 'Al Hoceïma', ar: 'الحسيمة' },
+    { value: 'Asilah', ar: 'أصيلة' },
+    { value: 'Azrou', ar: 'أزرو' },
+    { value: 'Béni Mellal', ar: 'بني ملال' },
+    { value: 'Benslimane', ar: 'بن سليمان' },
+    { value: 'Berkane', ar: 'بركان' },
+    { value: 'Berrechid', ar: 'برشيد' },
+    { value: 'Bouznika', ar: 'بوزنيقة' },
+    { value: 'Casablanca', ar: 'الدار البيضاء' },
+    { value: 'Chefchaouen', ar: 'شفشاون' },
+    { value: 'Dakhla', ar: 'الداخلة' },
+    { value: 'El Jadida', ar: 'الجديدة' },
+    { value: 'Errachidia', ar: 'الرشيدية' },
+    { value: 'Essaouira', ar: 'الصويرة' },
+    { value: 'Fès', ar: 'فاس' },
+    { value: 'Fquih Ben Salah', ar: 'الفقيه بن صالح' },
+    { value: 'Guelmim', ar: 'كلميم' },
+    { value: 'Guercif', ar: 'جرسيف' },
+    { value: 'Ifrane', ar: 'إفران' },
+    { value: 'Jerada', ar: 'جرادة' },
+    { value: 'Kénitra', ar: 'القنيطرة' },
+    { value: 'Khémisset', ar: 'الخميسات' },
+    { value: 'Khénifra', ar: 'خنيفرة' },
+    { value: 'Khouribga', ar: 'خريبكة' },
+    { value: 'Ksar El Kébir', ar: 'القصر الكبير' },
+    { value: 'Laâyoune', ar: 'العيون' },
+    { value: 'Larache', ar: 'العرائش' },
+    { value: 'Marrakech', ar: 'مراكش' },
+    { value: 'Martil', ar: 'مرتيل' },
+    { value: 'Meknès', ar: 'مكناس' },
+    { value: 'Midelt', ar: 'ميدلت' },
+    { value: "M'diq", ar: 'المضيق' },
+    { value: 'Mohammedia', ar: 'المحمدية' },
+    { value: 'Nador', ar: 'الناظور' },
+    { value: 'Ouarzazate', ar: 'ورزازات' },
+    { value: 'Ouazzane', ar: 'وزان' },
+    { value: 'Oujda', ar: 'وجدة' },
+    { value: 'Rabat', ar: 'الرباط' },
+    { value: 'Safi', ar: 'آسفي' },
+    { value: 'Salé', ar: 'سلا' },
+    { value: 'Sefrou', ar: 'صفرو' },
+    { value: 'Settat', ar: 'سطات' },
+    { value: 'Sidi Bennour', ar: 'سيدي بنور' },
+    { value: 'Sidi Kacem', ar: 'سيدي قاسم' },
+    { value: 'Sidi Slimane', ar: 'سيدي سليمان' },
+    { value: 'Skhirate', ar: 'الصخيرات' },
+    { value: 'Tan-Tan', ar: 'طانطان' },
+    { value: 'Tanger', ar: 'طنجة' },
+    { value: 'Taounate', ar: 'تاونات' },
+    { value: 'Taourirt', ar: 'تاوريرت' },
+    { value: 'Taroudant', ar: 'تارودانت' },
+    { value: 'Taza', ar: 'تازة' },
+    { value: 'Témara', ar: 'تمارة' },
+    { value: 'Tétouan', ar: 'تطوان' },
+    { value: 'Tiznit', ar: 'تيزنيت' },
+    { value: 'Youssoufia', ar: 'اليوسفية' },
+    { value: 'Zagora', ar: 'زاكورة' },
+];
+
+// Libellé affiché dans le menu : les deux langues toujours visibles, dans l'ordre adapté
+// au sens de lecture courant, pour rester lisible aussi bien en FR qu'en AR.
+function libelleVille(v, langue) {
+    return langue === 'ar' ? `${v.ar} — ${v.value}` : `${v.value} — ${v.ar}`;
+}
 
 function CheckoutPage() {
     const { articles, totalPrix, codePromo, viderPanier } = useCart();
     const { reduction } = usePromoReduction(codePromo, totalPrix);
-    const { t } = useLanguage();
-    const [villes, setVilles] = useState([]);
-    const [villeId, setVilleId] = useState('');
+    const { t, langue } = useLanguage();
     const [nomClient, setNomClient] = useState('');
     const [telephoneClient, setTelephoneClient] = useState('');
+    const [ville, setVille] = useState('');
     const [adresseLivraison, setAdresseLivraison] = useState('');
-    const [notes, setNotes] = useState('');
     const [envoiEnCours, setEnvoiEnCours] = useState(false);
     const [erreur, setErreur] = useState(null);
     const [commandeConfirmee, setCommandeConfirmee] = useState(null);
     const navigate = useNavigate();
 
-    useEffect(() => {
-        villeApi.getAll().then(setVilles).catch(console.error);
-    }, []);
-
-    const villeSelectionnee = villes.find((v) => String(v.id) === String(villeId));
-    const fraisLivraison = villeSelectionnee ? villeSelectionnee.fraisLivraison : 0;
-    const totalFinal = Math.max(0, totalPrix - reduction) + fraisLivraison;
+    // Livraison toujours gratuite, quelle que soit la ville : aucun frais n'est calculé.
+    // La ville reste demandée au client (simple champ, pas de tarification) pour que
+    // l'admin sache où expédier la commande.
+    const totalFinal = Math.max(0, totalPrix - reduction);
 
     async function soumettreCommande(e) {
         e.preventDefault();
         setErreur(null);
 
-        if (!villeId) {
-            setErreur(t('erreurVilleRequise'));
-            return;
-        }
-
         const payload = {
             nomClient,
             telephoneClient,
+            ville,
             adresseLivraison,
-            villeId: Number(villeId),
-            notes: notes || null,
             codePromo: codePromo || null,
             lignes: articles.map((a) => ({ produitId: a.produitId, quantite: a.quantite })),
         };
@@ -103,11 +165,11 @@ function CheckoutPage() {
 
                 <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">{t('ville')}</label>
-                    <select required value={villeId} onChange={(e) => setVilleId(e.target.value)}
+                    <select required value={ville} onChange={(e) => setVille(e.target.value)}
                             className="w-full px-3 py-3 text-base border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500">
                         <option value="">{t('selectionnerVille')}</option>
-                        {villes.map((v) => (
-                            <option key={v.id} value={v.id}>{v.nom} — {v.fraisLivraison} {t('fraisLivraisonSuffixe')}</option>
+                        {VILLES_MAROC.map((v) => (
+                            <option key={v.value} value={v.value}>{libelleVille(v, langue)}</option>
                         ))}
                     </select>
                 </div>
@@ -115,12 +177,6 @@ function CheckoutPage() {
                 <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">{t('adresseLivraison')}</label>
                     <textarea required rows={2} value={adresseLivraison} onChange={(e) => setAdresseLivraison(e.target.value)}
-                              className="w-full px-3 py-3 text-base border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500" />
-                </div>
-
-                <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">{t('notesOptionnel')}</label>
-                    <textarea rows={2} value={notes} onChange={(e) => setNotes(e.target.value)}
                               className="w-full px-3 py-3 text-base border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500" />
                 </div>
 
@@ -147,7 +203,7 @@ function CheckoutPage() {
                     {reduction > 0 && (
                         <div className="flex justify-between text-green-700"><span>{t('reduction')} ({codePromo})</span><span>-{reduction.toFixed(2)} DH</span></div>
                     )}
-                    <div className="flex justify-between text-gray-600"><span>{t('livraison')}</span><span>{villeSelectionnee ? `${fraisLivraison} DH` : '—'}</span></div>
+                    <div className="flex justify-between text-gray-600"><span>{t('livraison')}</span><span className="text-green-700 font-medium">{t('livraisonGratuite')}</span></div>
                     <div className="flex justify-between font-bold text-gray-900 text-base pt-2 border-t border-gray-200">
                         <span>{t('total')}</span><span>{totalFinal.toFixed(2)} DH</span>
                     </div>

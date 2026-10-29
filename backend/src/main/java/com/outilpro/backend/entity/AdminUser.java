@@ -24,8 +24,9 @@ public class AdminUser {
     @Column(nullable = false)
     private String passwordHash;
 
-    @Column(nullable = false)
-    private String role;
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false, length = 20)
+    private RoleAdmin role;
 
     @Builder.Default
     @Column(nullable = false)

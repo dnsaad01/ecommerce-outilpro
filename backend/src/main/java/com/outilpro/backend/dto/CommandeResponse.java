@@ -15,14 +15,11 @@ public class CommandeResponse {
     private String nomClient;
     private String telephoneClient;
     private String adresseLivraison;
-    private Long villeId;
-    private String villeNom;
-    private BigDecimal fraisLivraison;
+    private String ville;
     private BigDecimal sousTotal;
     private BigDecimal reductionMontant;
     private BigDecimal total;
     private StatutCommande statut;
-    private String notes;
     private LocalDateTime dateCreation;
     private List<LigneCommandeResponse> lignes;
     private String codePromoUtilise;

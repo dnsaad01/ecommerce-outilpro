@@ -3,7 +3,6 @@ package com.outilpro.backend.dto;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotEmpty;
-import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 import lombok.Getter;
@@ -30,11 +29,9 @@ public class CommandeRequest {
     @Size(max = 500, message = "L'adresse ne peut pas dépasser 500 caractères")
     private String adresseLivraison;
 
-    @NotNull(message = "La ville est obligatoire")
-    private Long villeId;
-
-    @Size(max = 1000, message = "Les notes ne peuvent pas dépasser 1000 caractères")
-    private String notes;
+    @NotBlank(message = "La ville est obligatoire")
+    @Size(max = 100, message = "La ville ne peut pas dépasser 100 caractères")
+    private String ville;
 
     private String codePromo; // optionnel, laisse vide ou null si pas de code
 

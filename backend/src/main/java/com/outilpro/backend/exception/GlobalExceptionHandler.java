@@ -4,6 +4,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -32,6 +33,14 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(BadCredentialsException.class)
     public ResponseEntity<Map<String, Object>> handleBadCredentials(BadCredentialsException ex) {
         return buildResponse(HttpStatus.UNAUTHORIZED, ex.getMessage());
+    }
+
+    // Levée par @PreAuthorize (Rôles & Permissions) quand un EMPLOYE appelle un endpoint
+    // réservé à ADMIN. Sans ce handler explicite, elle serait absorbée par le catch-all
+    // générique ci-dessous et renverrait une 500 trompeuse au lieu d'une 403 claire.
+    @ExceptionHandler(AccessDeniedException.class)
+    public ResponseEntity<Map<String, Object>> handleAccesRefuse(AccessDeniedException ex) {
+        return buildResponse(HttpStatus.FORBIDDEN, "Accès refusé : votre rôle ne permet pas cette action.");
     }
 
     // Déclenché quand on essaie de supprimer une ligne encore référencée ailleurs

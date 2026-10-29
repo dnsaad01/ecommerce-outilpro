@@ -29,9 +29,11 @@ public interface CommandeRepository extends JpaRepository<Commande, Long> {
     @Query("SELECT c.dateCreation, c.total FROM Commande c WHERE c.statut <> :statutExclu AND c.dateCreation >= :depuis")
     List<Object[]> ventesDepuis(@Param("statutExclu") StatutCommande statutExclu, @Param("depuis") LocalDateTime depuis);
 
-    // Répartition des ventes par ville de livraison (toutes commandes non annulées), triée
-    // par chiffre d'affaires décroissant.
-    @Query("SELECT c.villeNom, COUNT(c), SUM(c.total) FROM Commande c " +
-            "WHERE c.statut <> :statutExclu GROUP BY c.villeNom ORDER BY SUM(c.total) DESC")
+    // Répartition des ventes par ville (telle que saisie librement par le client, pas une
+    // entité de référence), triée par chiffre d'affaires décroissant. COALESCE regroupe les
+    // commandes historiques sans ville renseignée (créées avant l'ajout du champ) sous un
+    // libellé unique plutôt que de les exclure.
+    @Query("SELECT COALESCE(c.ville, 'Non renseignée'), COUNT(c), SUM(c.total) FROM Commande c " +
+            "WHERE c.statut <> :statutExclu GROUP BY COALESCE(c.ville, 'Non renseignée') ORDER BY SUM(c.total) DESC")
     List<Object[]> repartitionParVille(@Param("statutExclu") StatutCommande statutExclu);
 }

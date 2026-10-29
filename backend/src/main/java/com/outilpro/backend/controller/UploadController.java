@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -18,11 +19,13 @@ import java.util.UUID;
 
 /**
  * Upload d'images (catégories, marques, produits...) depuis le dashboard admin.
- * Protégé par JWT comme toute route non listée dans SecurityConfig (anyRequest().authenticated()).
+ * Réservé à ADMIN : sert uniquement les formulaires de gestion du catalogue
+ * (produits, catégories, marques), tous eux-mêmes réservés à ADMIN.
  */
 @RestController
 @RequestMapping("/api/uploads")
 @RequiredArgsConstructor
+@PreAuthorize("hasRole('ADMIN')")
 public class UploadController {
 
     // Extension dérivée du Content-Type validé, PAS du nom de fichier fourni par le client :

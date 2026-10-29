@@ -125,7 +125,7 @@ function CommandesPage() {
                                                 <div className="font-medium text-gray-900">{commande.nomClient}</div>
                                                 <div className="text-gray-500 text-xs">{commande.telephoneClient}</div>
                                             </td>
-                                            <td className="px-4 py-3 text-gray-700">{commande.villeNom}</td>
+                                            <td className="px-4 py-3 text-gray-700">{commande.ville}</td>
                                             <td className="px-4 py-3 font-semibold text-gray-900">
                                                 {commande.total.toFixed(2)} DH
                                             </td>
@@ -166,7 +166,6 @@ function CommandesPage() {
                                                         {commande.codePromoUtilise && (
                                                             <span> · Code promo : <strong>{commande.codePromoUtilise}</strong></span>
                                                         )}
-                                                        {commande.notes && <span> · Notes : {commande.notes}</span>}
                                                     </div>
                                                     <table className="w-full text-xs">
                                                         <thead className="text-gray-500">
@@ -202,7 +201,7 @@ function CommandesPage() {
                                                             )}
                                                             <tr>
                                                                 <td colSpan={4} className="text-right py-1">Livraison</td>
-                                                                <td className="text-right py-1">{commande.fraisLivraison.toFixed(2)} DH</td>
+                                                                <td className="text-right py-1 text-green-700 font-medium">Gratuite</td>
                                                             </tr>
                                                             <tr className="font-bold">
                                                                 <td colSpan={4} className="text-right py-2">Total</td>

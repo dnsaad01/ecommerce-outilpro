@@ -7,6 +7,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -28,16 +29,20 @@ public class CategorieController {
         return ResponseEntity.ok(categorieService.findById(id));
     }
 
+    // Configuration du catalogue réservée à ADMIN (hors périmètre EMPLOYE).
+    @PreAuthorize("hasRole('ADMIN')")
     @PostMapping
     public ResponseEntity<CategorieResponse> create(@Valid @RequestBody CategorieRequest request) {
         return ResponseEntity.status(HttpStatus.CREATED).body(categorieService.create(request));
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     @PutMapping("/{id}")
     public ResponseEntity<CategorieResponse> update(@PathVariable Long id, @Valid @RequestBody CategorieRequest request) {
         return ResponseEntity.ok(categorieService.update(id, request));
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> delete(@PathVariable Long id) {
         categorieService.delete(id);

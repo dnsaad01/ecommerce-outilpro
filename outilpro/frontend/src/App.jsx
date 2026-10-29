@@ -11,16 +11,25 @@ import CollectionsPage from './pages/CollectionsPage';
 import PromotionsPage from './pages/PromotionsPage';
 import LoginPage from "./pages/admin/LoginPage";
 import ProtectedRoute from "./components/admin/ProtectedRoute";
+import { useAuth } from "./context/AuthContext";
 import AdminLayout from "./components/admin/AdminLayout";
 import CommandesPage from "./pages/admin/CommandesPage";
 import CategoriesPage from "./pages/admin/CategoriesPage";
 import MarquesAdminPage from "./pages/admin/MarquesPage";
-import VillesPage from "./pages/admin/VillesPage";
 import PromosPage from "./pages/admin/PromosPage";
 import ProduitsPage from "./pages/admin/ProduitsPage";
 import StockPage from "./pages/admin/StockPage";
 import StatsPage from "./pages/admin/StatsPage";
 import AnalysesPage from "./pages/admin/AnalysesPage";
+
+// "/admin" doit mener à un accueil différent selon le rôle : un EMPLOYE n'a pas accès
+// à /admin/stats (réservé à ADMIN, voir ProtectedRoute roles=['ADMIN'] plus bas), donc
+// le rediriger là produirait un aller-retour visible (redirigé une 2e fois vers
+// /admin/commandes). On choisit directement la bonne destination ici.
+function AdminAccueilRedirect() {
+    const { estAdmin } = useAuth();
+    return <Navigate to={estAdmin ? "/admin/stats" : "/admin/commandes"} replace />;
+}
 
 function App() {
     const location = useLocation();
@@ -45,20 +54,25 @@ function App() {
 
                 {/* Route Login Admin */}
                 <Route path="/admin/login" element={<LoginPage />} />
-                <Route path="/admin" element={<Navigate to="/admin/stats" replace />} />
+                <Route path="/admin" element={<AdminAccueilRedirect />} />
 
-                {/* Routes Protégées Admin */}
+                {/* Routes Protégées Admin -- accessibles à ADMIN et EMPLOYE (gestion des
+                    commandes + consultation des produits, voir Rôles & Permissions) */}
                 <Route element={<ProtectedRoute />}>
                     <Route element={<AdminLayout />}>
-                        <Route path="/admin/stats" element={<StatsPage />} />
-                        <Route path="/admin/analyses" element={<AnalysesPage />} />
                         <Route path="/admin/commandes" element={<CommandesPage />} />
                         <Route path="/admin/produits" element={<ProduitsPage />} />
-                        <Route path="/admin/stock" element={<StockPage />} />
-                        <Route path="/admin/categories" element={<CategoriesPage />} />
-                        <Route path="/admin/marques" element={<MarquesAdminPage />} />
-                        <Route path="/admin/villes" element={<VillesPage />} />
-                        <Route path="/admin/promos" element={<PromosPage />} />
+
+                        {/* Routes réservées à ADMIN : statistiques financières/sensibles et
+                            configuration du catalogue, hors périmètre EMPLOYE. */}
+                        <Route element={<ProtectedRoute roles={['ADMIN']} />}>
+                            <Route path="/admin/stats" element={<StatsPage />} />
+                            <Route path="/admin/analyses" element={<AnalysesPage />} />
+                            <Route path="/admin/stock" element={<StockPage />} />
+                            <Route path="/admin/categories" element={<CategoriesPage />} />
+                            <Route path="/admin/marques" element={<MarquesAdminPage />} />
+                            <Route path="/admin/promos" element={<PromosPage />} />
+                        </Route>
                     </Route>
                 </Route>
             </Routes>

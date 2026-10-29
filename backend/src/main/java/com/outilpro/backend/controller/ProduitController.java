@@ -11,6 +11,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -51,16 +52,21 @@ public class ProduitController {
         return ResponseEntity.ok(produitService.findById(id));
     }
 
+    // Création/modification/suppression réservées à ADMIN : EMPLOYE n'a qu'un accès
+    // en consultation (lecture) aux produits, les GET ci-dessus restent ouverts à tout utilisateur authentifié.
+    @PreAuthorize("hasRole('ADMIN')")
     @PostMapping
     public ResponseEntity<ProduitResponse> create(@Valid @RequestBody ProduitRequest request) {
         return ResponseEntity.status(HttpStatus.CREATED).body(produitService.create(request));
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     @PutMapping("/{id}")
     public ResponseEntity<ProduitResponse> update(@PathVariable Long id, @Valid @RequestBody ProduitRequest request) {
         return ResponseEntity.ok(produitService.update(id, request));
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> delete(@PathVariable Long id) {
         produitService.delete(id);

@@ -1,6 +1,14 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { useAuth } from "../../context/AuthContext";
+import { useAuth, consommerMotifDeconnexion } from "../../context/AuthContext";
+
+// Messages affichés quand cette page est atteinte suite à une déconnexion AUTOMATIQUE
+// (voir AuthContext.jsx) plutôt qu'un clic volontaire sur "Déconnexion" ou une simple
+// visite directe -- pour que l'admin comprenne pourquoi il se retrouve ici sans l'avoir demandé.
+const MESSAGES_MOTIF_DECONNEXION = {
+    expiration: "Votre session a expiré. Veuillez vous reconnecter.",
+    inactivite: "Vous avez été déconnecté(e) après une période d'inactivité. Veuillez vous reconnecter.",
+};
 
 export default function LoginPage() {
     const [username, setUsername] = useState("");
@@ -10,13 +18,25 @@ export default function LoginPage() {
     const { login } = useAuth();
     const navigate = useNavigate();
 
+    // consommerMotifDeconnexion() retire le motif du sessionStorage en le lisant : ce
+    // message ne s'affiche donc qu'une seule fois, pas à chaque rafraîchissement ultérieur
+    // de cette page.
+    useEffect(() => {
+        const motif = consommerMotifDeconnexion();
+        if (motif && MESSAGES_MOTIF_DECONNEXION[motif]) {
+            setErreur(MESSAGES_MOTIF_DECONNEXION[motif]);
+        }
+    }, []);
+
     const soumettre = async (e) => {
         e.preventDefault();
         setErreur("");
         setChargement(true);
         try {
             await login(username, password);
-            navigate("/admin/stats", { replace: true });
+            // "/admin" (et non "/admin/stats" en dur) : AdminAccueilRedirect choisit la bonne
+            // destination selon le rôle (un EMPLOYE n'a pas accès à /admin/stats).
+            navigate("/admin", { replace: true });
         } catch (err) {
             setErreur("Identifiants invalides");
         } finally {

@@ -5,7 +5,6 @@ import com.outilpro.backend.entity.*;
 import com.outilpro.backend.exception.ResourceNotFoundException;
 import com.outilpro.backend.repository.CommandeRepository;
 import com.outilpro.backend.repository.ProduitRepository;
-import com.outilpro.backend.repository.VilleRepository;
 import com.outilpro.backend.service.CommandeService;
 import com.outilpro.backend.service.PromoCodeService;
 import lombok.RequiredArgsConstructor;
@@ -27,7 +26,6 @@ public class CommandeServiceImpl implements CommandeService {
 
     private final CommandeRepository commandeRepository;
     private final ProduitRepository produitRepository;
-    private final VilleRepository villeRepository;
     private final PromoCodeService promoCodeService;
 
     @Override
@@ -47,18 +45,14 @@ public class CommandeServiceImpl implements CommandeService {
 
     @Override
     public CommandeResponse create(CommandeRequest request) {
-        Ville ville = villeRepository.findById(request.getVilleId())
-                .orElseThrow(() -> new ResourceNotFoundException("Ville introuvable, id=" + request.getVilleId()));
-
+        // Livraison toujours gratuite, sans frais selon la ville ; la ville saisie par le
+        // client est tout de même enregistrée (simple texte) pour que l'admin sache où expédier.
         Commande commande = Commande.builder()
                 .nomClient(request.getNomClient())
                 .telephoneClient(request.getTelephoneClient())
                 .adresseLivraison(request.getAdresseLivraison())
-                .villeId(ville.getId())
-                .villeNom(ville.getNom())
-                .fraisLivraison(ville.getFraisLivraison())
+                .ville(request.getVille())
                 .statut(StatutCommande.EN_ATTENTE)
-                .notes(request.getNotes())
                 .dateCreation(LocalDateTime.now())
                 .build();
 
@@ -113,7 +107,7 @@ public class CommandeServiceImpl implements CommandeService {
             codePromoUtilise = request.getCodePromo().trim().toUpperCase();
         }
 
-        BigDecimal total = sousTotal.add(ville.getFraisLivraison()).subtract(reduction)
+        BigDecimal total = sousTotal.subtract(reduction)
                 .setScale(2, RoundingMode.HALF_UP);
 
         commande.setSousTotal(sousTotal.setScale(2, RoundingMode.HALF_UP));
@@ -146,15 +140,12 @@ public class CommandeServiceImpl implements CommandeService {
                 .nomClient(commande.getNomClient())
                 .telephoneClient(commande.getTelephoneClient())
                 .adresseLivraison(commande.getAdresseLivraison())
-                .villeId(commande.getVilleId())
-                .villeNom(commande.getVilleNom())
-                .fraisLivraison(commande.getFraisLivraison())
+                .ville(commande.getVille())
                 .sousTotal(commande.getSousTotal())
                 .reductionMontant(commande.getReductionMontant())
                 .codePromoUtilise(commande.getCodePromoUtilise())
                 .total(commande.getTotal())
                 .statut(commande.getStatut())
-                .notes(commande.getNotes())
                 .dateCreation(commande.getDateCreation())
                 .lignes(lignes)
                 .build();

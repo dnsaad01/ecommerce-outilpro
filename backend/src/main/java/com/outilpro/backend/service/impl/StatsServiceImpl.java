@@ -29,9 +29,10 @@ import java.util.stream.Collectors;
 
 // Dashboard admin volontairement resserré sur les indicateurs essentiels à la gestion
 // quotidienne d'une quincaillerie en ligne : chiffre d'affaires, commandes, alertes de
-// stock, produits les plus vendus et ventes par ville. Les métriques dérivées (panier
-// moyen, articles par commande, performance par catégorie) ont été retirées : elles
-// n'aidaient pas directement à l'exploitation et alourdissaient l'interface et l'API.
+// stock, produits les plus vendus et ventes par ville (basée sur le champ texte libre
+// Commande.ville, pour suivre d'où viennent les clients -- la livraison reste gratuite,
+// cette répartition est purement analytique). Les autres métriques dérivées (panier
+// moyen, articles par commande, performance par catégorie) restent retirées.
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
@@ -116,6 +117,8 @@ public class StatsServiceImpl implements StatsService {
         return resultat;
     }
 
+    // Répartition des ventes par ville (telle que saisie par le client), triée par chiffre
+    // d'affaires décroissant -- pour analyser d'où proviennent les clients.
     private List<VenteVilleResponse> calculerVentesParVille() {
         List<VenteVilleResponse> resultat = new ArrayList<>();
         for (Object[] ligne : commandeRepository.repartitionParVille(StatutCommande.ANNULEE)) {

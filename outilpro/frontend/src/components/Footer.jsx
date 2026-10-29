@@ -1,5 +1,6 @@
 import { Link } from 'react-router-dom';
 import { useLanguage } from '../context/LanguageContext';
+import { Logo } from './Logo';
 
 function Footer() {
     const { t } = useLanguage();
@@ -15,8 +16,8 @@ function Footer() {
         <footer className="bg-gray-900 text-gray-300 mt-16">
             <div className="max-w-7xl mx-auto px-4 py-12 grid grid-cols-1 sm:grid-cols-3 gap-10">
                 <div>
-                    <Link to="/" className="text-2xl font-bold text-white tracking-tight">
-                        Outil<span className="text-orange-500">Pro</span>
+                    <Link to="/" className="inline-block">
+                        <Logo className="h-10" />
                     </Link>
                     <p className="text-sm text-gray-400 mt-3 max-w-xs">
                         {t('footerTagline')}
@@ -48,7 +49,7 @@ function Footer() {
 
             <div className="border-t border-gray-800">
                 <div className="max-w-7xl mx-auto px-4 py-4 text-xs text-gray-500 text-center">
-                    © {new Date().getFullYear()} OutilPro. {t('tousDroitsReserves')}
+                    © {new Date().getFullYear()} Spartak brico. {t('tousDroitsReserves')}
                 </div>
             </div>
         </footer>

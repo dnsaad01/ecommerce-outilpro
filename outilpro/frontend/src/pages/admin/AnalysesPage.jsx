@@ -232,8 +232,9 @@ function BlocEvolutionVentes({ ventesParJour, ventesParMois }) {
     );
 }
 
-// Ventes par ville : barres (top 6) + nombre de commandes par ville en regard du CA.
-// Le détail liste toutes les villes avec leur part du chiffre d'affaires total.
+// Ventes par ville (telle que saisie par le client à la commande, pas une entité de
+// référence) : barres (top 8) + nombre de commandes par ville en regard du CA. Le détail
+// liste toutes les villes avec leur part du chiffre d'affaires total.
 function BlocVentesParVille({ donnees }) {
     const [detailOuvert, setDetailOuvert] = useState(false);
     const top = donnees.slice(0, 8);

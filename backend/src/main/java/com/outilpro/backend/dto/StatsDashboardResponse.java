@@ -9,9 +9,10 @@ import java.util.Map;
 
 // DTO du dashboard admin : volontairement limité aux indicateurs essentiels à la gestion
 // quotidienne d'une boutique d'outillage -- chiffre d'affaires, commandes, alertes de
-// stock, produits les plus vendus et ventes par ville. Les métriques dérivées (panier
-// moyen, articles par commande, performance par catégorie) ont été retirées : elles
-// n'apportaient pas de valeur opérationnelle directe et alourdissaient l'interface.
+// stock, produits les plus vendus et ventes par ville (basée sur le champ texte libre
+// Commande.ville saisi par le client, pas sur une entité de référence). Les autres
+// métriques dérivées (panier moyen, articles par commande, performance par catégorie)
+// restent retirées : elles n'apportaient pas de valeur opérationnelle directe.
 @Getter
 @Builder
 public class StatsDashboardResponse {

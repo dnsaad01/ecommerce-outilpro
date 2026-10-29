@@ -29,12 +29,13 @@ public class AdminAuthServiceImpl implements AdminAuthService {
             throw new BadCredentialsException("Identifiants invalides");
         }
 
-        String token = jwtService.generateToken(adminUser.getUsername(), adminUser.getRole());
+        String role = adminUser.getRole().name();
+        String token = jwtService.generateToken(adminUser.getUsername(), role);
 
         return LoginResponse.builder()
                 .token(token)
                 .username(adminUser.getUsername())
-                .role(adminUser.getRole())
+                .role(role)
                 .build();
     }
 }

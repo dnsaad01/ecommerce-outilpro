@@ -4,6 +4,7 @@ import com.outilpro.backend.entity.TypeReduction;
 import jakarta.validation.constraints.DecimalMin;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -15,6 +16,7 @@ import java.time.LocalDate;
 public class PromoCodeRequest {
 
     @NotBlank(message = "Le code est obligatoire")
+    @Size(max = 50, message = "Le code ne peut pas dépasser 50 caractères")
     private String code;
 
     @NotNull(message = "Le type de réduction est obligatoire")
