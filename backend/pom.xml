@@ -94,7 +94,7 @@
 			<version>0.12.6</version>
 			<scope>runtime</scope>
 		</dependency>
-		<!-- Lecture/ecriture de fichiers Excel (.xlsx) -- utilise pour l'import en masse de
+		<!-- Lecture/ecriture de fichiers Excel (.xlsx), utilisee pour l'import en masse de
 		     produits/categories/marques et pour generer le modele telechargeable. -->
 		<dependency>
 			<groupId>org.apache.poi</groupId>
