@@ -18,10 +18,18 @@ WORKDIR /app
 
 # Utilisateur non-root : une bonne pratique de sécurité de base pour un conteneur
 # exposé, même derrière le réseau interne de Coolify.
-RUN addgroup -S spring && adduser -S spring -G spring
+#
+# /app doit appartenir a "spring" (et pas root, le proprietaire par defaut) : au
+# premier upload d'image, le backend cree lui-meme le dossier uploads/ a l'interieur
+# de /app (Files.createDirectories dans UploadController) -- sans cette ligne, cette
+# creation echoue avec "Permission denied" (-> 500 cote client) des que le conteneur
+# tourne sous l'utilisateur non-root "spring".
+RUN addgroup -S spring && adduser -S spring -G spring \
+    && mkdir -p /app/uploads \
+    && chown -R spring:spring /app
 USER spring
 
-COPY --from=build /app/target/*.jar app.jar
+COPY --from=build --chown=spring:spring /app/target/*.jar app.jar
 
 EXPOSE 8081
 
