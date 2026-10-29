@@ -29,6 +29,10 @@ public interface ProduitRepository extends JpaRepository<Produit, Long> {
 
     boolean existsBySkuAndIdNot(String sku, Long id);
 
+    // Utilise par l'import Excel pour decider si une ligne cree un nouveau produit
+    // ou met a jour un produit existant portant deja ce SKU.
+    Optional<Produit> findBySku(String sku);
+
     // Catalogue public : tous les filtres sont combinables (categorieId ET marqueId ET
     // recherche ET enStockUniquement en même temps), contrairement à l'ancienne version qui
     // ne supportait qu'un filtre à la fois. Chaque condition est ignorée quand son paramètre

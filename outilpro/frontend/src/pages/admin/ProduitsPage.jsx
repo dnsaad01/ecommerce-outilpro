@@ -6,7 +6,8 @@ import marqueApi from '../../api/marques';
 import ImageUploadField from '../../components/admin/ImageUploadField';
 import MultiImageUploadField from '../../components/admin/MultiImageUploadField';
 import AjusterStockModal from '../../components/admin/AjusterStockModal';
-import { IconImageOff, IconX } from '../../components/admin/icons';
+import ImporterProduitsModal from '../../components/admin/ImporterProduitsModal';
+import { IconImageOff, IconX, IconUpload } from '../../components/admin/icons';
 import ActionButtons from '../../components/admin/ActionButtons';
 import { useAuth } from '../../context/AuthContext';
 
@@ -95,6 +96,7 @@ function ProduitsPage() {
     const [rechercheAppliquee, setRechercheAppliquee] = useState('');
     const [chargement, setChargement] = useState(true);
     const [erreur, setErreur] = useState(null);
+    const [modalImportOuvert, setModalImportOuvert] = useState(false);
 
     const [categories, setCategories] = useState([]);
     const [marques, setMarques] = useState([]);
@@ -274,12 +276,21 @@ function ProduitsPage() {
             <div className="flex items-center justify-between mb-6">
                 <h1 className="text-2xl font-bold text-gray-900">Produits</h1>
                 {estAdmin ? (
-                    <button
-                        onClick={ouvrirCreation}
-                        className="bg-gray-900 text-white text-sm font-medium px-4 py-2 rounded hover:bg-gray-800"
-                    >
-                        + Nouveau produit
-                    </button>
+                    <div className="flex items-center gap-2">
+                        <button
+                            onClick={() => setModalImportOuvert(true)}
+                            className="inline-flex items-center gap-2 border border-gray-200 text-gray-700 text-sm font-medium px-4 py-2 rounded hover:bg-gray-50"
+                        >
+                            <IconUpload className="w-4 h-4" />
+                            Importer (Excel)
+                        </button>
+                        <button
+                            onClick={ouvrirCreation}
+                            className="bg-gray-900 text-white text-sm font-medium px-4 py-2 rounded hover:bg-gray-800"
+                        >
+                            + Nouveau produit
+                        </button>
+                    </div>
                 ) : (
                     <span className="text-xs font-medium text-gray-500 bg-gray-100 px-3 py-1.5 rounded-full">
                         Consultation seule
@@ -500,6 +511,13 @@ function ProduitsPage() {
                 <AjusterStockModal
                     produit={produitEnAjustement}
                     onFermer={() => setProduitEnAjustement(null)}
+                    onSucces={chargerProduits}
+                />
+            )}
+
+            {modalImportOuvert && (
+                <ImporterProduitsModal
+                    onFermer={() => setModalImportOuvert(false)}
                     onSucces={chargerProduits}
                 />
             )}
