@@ -3,6 +3,7 @@ package com.outilpro.backend.service.impl;
 import com.outilpro.backend.dto.*;
 import com.outilpro.backend.entity.*;
 import com.outilpro.backend.exception.ResourceNotFoundException;
+import com.outilpro.backend.notification.TelegramNotificationService;
 import com.outilpro.backend.repository.CommandeRepository;
 import com.outilpro.backend.repository.ProduitRepository;
 import com.outilpro.backend.service.CommandeService;
@@ -27,6 +28,7 @@ public class CommandeServiceImpl implements CommandeService {
     private final CommandeRepository commandeRepository;
     private final ProduitRepository produitRepository;
     private final PromoCodeService promoCodeService;
+    private final TelegramNotificationService telegramNotificationService;
 
     @Override
     @Transactional(readOnly = true)
@@ -115,7 +117,9 @@ public class CommandeServiceImpl implements CommandeService {
         commande.setCodePromoUtilise(codePromoUtilise);
         commande.setTotal(total);
 
-        return toResponse(commandeRepository.save(commande));
+        Commande commandeSauvegardee = commandeRepository.save(commande);
+        telegramNotificationService.notifierNouvelleCommande(commandeSauvegardee);
+        return toResponse(commandeSauvegardee);
     }
 
     @Override
