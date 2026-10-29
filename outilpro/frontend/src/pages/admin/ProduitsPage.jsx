@@ -4,6 +4,7 @@ import produitApi from '../../api/produits';
 import categorieApi from '../../api/categories';
 import marqueApi from '../../api/marques';
 import ImageUploadField from '../../components/admin/ImageUploadField';
+import MultiImageUploadField from '../../components/admin/MultiImageUploadField';
 import AjusterStockModal from '../../components/admin/AjusterStockModal';
 import { IconImageOff, IconX } from '../../components/admin/icons';
 import ActionButtons from '../../components/admin/ActionButtons';
@@ -19,6 +20,7 @@ const FORM_VIDE = {
     categorieId: '',
     marqueId: '',
     imageUrl: '',
+    imagesSupplementaires: [],
 };
 
 // Une carte produit : image cadrée en haut, infos essentielles en dessous.
@@ -206,6 +208,7 @@ function ProduitsPage() {
             categorieId: produit.categorieId,
             marqueId: produit.marqueId,
             imageUrl: produit.imageUrl || '',
+            imagesSupplementaires: produit.imagesSupplementaires || [],
         });
         setErreurFormulaire(null);
         setFormOuvert(true);
@@ -231,6 +234,7 @@ function ProduitsPage() {
                 categorieId: parseInt(form.categorieId, 10),
                 marqueId: parseInt(form.marqueId, 10),
                 imageUrl: form.imageUrl || null,
+                imagesSupplementaires: form.imagesSupplementaires,
             };
 
             if (produitEnEdition) {
@@ -422,6 +426,12 @@ function ProduitsPage() {
                         label="Image du produit (optionnel)"
                         value={form.imageUrl}
                         onChange={(url) => setForm((f) => ({ ...f, imageUrl: url }))}
+                    />
+
+                    <MultiImageUploadField
+                        label="Photos supplémentaires (optionnel)"
+                        value={form.imagesSupplementaires}
+                        onChange={(urls) => setForm((f) => ({ ...f, imagesSupplementaires: urls }))}
                     />
 
                     <div className="flex gap-2 pt-2">

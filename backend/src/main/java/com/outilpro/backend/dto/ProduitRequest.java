@@ -9,6 +9,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 import java.math.BigDecimal;
+import java.util.List;
 
 @Getter
 @Setter
@@ -36,6 +37,11 @@ public class ProduitRequest {
 
     @Size(max = 500, message = "L'URL de l'image ne peut pas dépasser 500 caractères")
     private String imageUrl;
+
+    // Photos supplementaires de la galerie (en plus de imageUrl). Chaque URL individuelle
+    // est deja validee en longueur par le meme controle que imageUrl ; null/absent = aucune
+    // photo supplementaire, liste geree entierement par le front (ajout/retrait avant envoi).
+    private List<@Size(max = 500, message = "Chaque URL d'image ne peut pas dépasser 500 caractères") String> imagesSupplementaires;
 
     @NotBlank(message = "Le SKU est obligatoire")
     @Size(max = 255, message = "Le SKU ne peut pas dépasser 255 caractères")

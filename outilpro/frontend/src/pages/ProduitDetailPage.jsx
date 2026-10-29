@@ -26,6 +26,7 @@ function ProduitDetailPage() {
     const [erreur, setErreur] = useState(null);
     const [quantite, setQuantite] = useState(1);
     const [ajoute, setAjoute] = useState(false);
+    const [indexImageActive, setIndexImageActive] = useState(0);
 
     useEffect(() => {
         let annule = false;
@@ -35,6 +36,7 @@ function ProduitDetailPage() {
             setErreur(null);
             setAjoute(false);
             setQuantite(1);
+            setIndexImageActive(0);
             try {
                 const data = await produitApi.getById(id);
                 if (annule) return;
@@ -85,6 +87,11 @@ function ProduitDetailPage() {
     const enStock = produit.stock > 0;
     const quantiteMax = Math.max(produit.stock, 1);
 
+    // Couverture (imageUrl) en premier, puis les photos supplementaires -- Boolean filtre
+    // un imageUrl vide/null sans casser l'ordre des suivantes.
+    const toutesLesPhotos = [produit.imageUrl, ...(produit.imagesSupplementaires || [])].filter(Boolean);
+    const photoAffichee = toutesLesPhotos[indexImageActive] || toutesLesPhotos[0];
+
     function changerQuantite(delta) {
         setQuantite((q) => Math.min(quantiteMax, Math.max(1, q + delta)));
     }
@@ -124,16 +131,38 @@ function ProduitDetailPage() {
             </nav>
 
             <div className="grid md:grid-cols-2 gap-10">
-                <div className="aspect-square bg-gray-50 rounded-lg border border-gray-200 shadow-sm relative overflow-hidden">
-                    {enPromo && (
-                        <span className="absolute top-3 start-3 bg-red-600 text-white text-xs font-bold px-2 py-1 rounded z-10">
-                            -{pourcentageReduction}%
-                        </span>
-                    )}
-                    {produit.imageUrl ? (
-                        <img src={produit.imageUrl} alt={produit.nom} className="w-full h-full object-cover" />
-                    ) : (
-                        <ImagePlaceholder label={t('pasDImage')} />
+                <div>
+                    <div className="aspect-square bg-gray-50 rounded-lg border border-gray-200 shadow-sm relative overflow-hidden">
+                        {enPromo && (
+                            <span className="absolute top-3 start-3 bg-red-600 text-white text-xs font-bold px-2 py-1 rounded z-10">
+                                -{pourcentageReduction}%
+                            </span>
+                        )}
+                        {photoAffichee ? (
+                            <img src={photoAffichee} alt={produit.nom} className="w-full h-full object-cover" />
+                        ) : (
+                            <ImagePlaceholder label={t('pasDImage')} />
+                        )}
+                    </div>
+
+                    {/* Vignettes cliquables : affichees seulement s'il y a plus d'une photo. */}
+                    {toutesLesPhotos.length > 1 && (
+                        <div className="flex gap-2 mt-3 overflow-x-auto pb-1">
+                            {toutesLesPhotos.map((url, index) => (
+                                <button
+                                    key={url + index}
+                                    type="button"
+                                    onClick={() => setIndexImageActive(index)}
+                                    className={`shrink-0 w-16 h-16 rounded-md overflow-hidden border-2 transition-colors ${
+                                        index === indexImageActive
+                                            ? 'border-orange-600'
+                                            : 'border-transparent hover:border-gray-300'
+                                    }`}
+                                >
+                                    <img src={url} alt="" className="w-full h-full object-cover" />
+                                </button>
+                            ))}
+                        </div>
                     )}
                 </div>
 

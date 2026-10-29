@@ -17,6 +17,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -74,6 +75,9 @@ public class ProduitServiceImpl implements ProduitService {
                 .prixPromotionnel(request.getPrixPromotionnel())
                 .stock(request.getStock())
                 .imageUrl(request.getImageUrl())
+                .imagesSupplementaires(request.getImagesSupplementaires() != null
+                        ? new ArrayList<>(request.getImagesSupplementaires())
+                        : new ArrayList<>())
                 .sku(request.getSku())
                 .categorie(categorie)
                 .marque(marque)
@@ -99,6 +103,14 @@ public class ProduitServiceImpl implements ProduitService {
         produit.setPrixPromotionnel(request.getPrixPromotionnel());
         produit.setStock(request.getStock());
         produit.setImageUrl(request.getImageUrl());
+        // Remplace le contenu de la collection geree par Hibernate plutot que de reassigner
+        // la reference (produit.setImagesSupplementaires(nouvelleListe)) : avec @OrderColumn,
+        // reassigner casse le suivi "orphanRemoval" implicite des collections @ElementCollection
+        // et peut laisser des lignes orphelines dans produit_images.
+        produit.getImagesSupplementaires().clear();
+        if (request.getImagesSupplementaires() != null) {
+            produit.getImagesSupplementaires().addAll(request.getImagesSupplementaires());
+        }
         produit.setSku(request.getSku());
         produit.setCategorie(categorie);
         produit.setMarque(marque);
@@ -144,6 +156,7 @@ public class ProduitServiceImpl implements ProduitService {
                 .enPromotion(produit.isEnPromotion())
                 .stock(produit.getStock())
                 .imageUrl(produit.getImageUrl())
+                .imagesSupplementaires(new ArrayList<>(produit.getImagesSupplementaires()))
                 .sku(produit.getSku())
                 .categorieId(produit.getCategorie().getId())
                 .categorieNom(produit.getCategorie().getNom())

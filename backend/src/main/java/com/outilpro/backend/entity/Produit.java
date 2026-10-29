@@ -4,6 +4,8 @@ import jakarta.persistence.*;
 import lombok.*;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Table(name = "produits")
@@ -38,6 +40,17 @@ public class Produit {
     private Integer stock;
 
     private String imageUrl;
+
+    // Photos supplementaires de la galerie (en plus de imageUrl, qui reste la photo de
+    // couverture affichee sur les cartes produit et en liste). Table a part generee par
+    // JPA (produit_images), ordre preserve via @OrderColumn -- c'est l'ordre d'ajout par
+    // defaut, l'admin peut en retirer n'importe laquelle depuis le formulaire.
+    @ElementCollection
+    @CollectionTable(name = "produit_images", joinColumns = @JoinColumn(name = "produit_id"))
+    @OrderColumn(name = "position")
+    @Column(name = "url", length = 500)
+    @Builder.Default
+    private List<String> imagesSupplementaires = new ArrayList<>();
 
     @Column(nullable = false, unique = true)
     private String sku;
