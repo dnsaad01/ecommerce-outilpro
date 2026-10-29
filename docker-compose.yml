@@ -14,17 +14,20 @@ services:
     image: postgres:16-alpine
     container_name: outilpro-postgres
     environment:
-      POSTGRES_DB: outilpro
-      POSTGRES_USER: outilpro
-      POSTGRES_PASSWORD: outilpro
+      POSTGRES_DB: ${DB_NAME:-outilpro}
+      POSTGRES_USER: ${DB_USER:-outilpro}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-outilpro}
     ports:
-      - "5435:5432"
+      - "${DB_PORT:-5435}:5432"
     volumes:
       - outilpro_postgres_data:/var/lib/postgresql/data
     networks:
       - outilpro_network
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U outilpro -d outilpro"]
+      # $POSTGRES_USER/$POSTGRES_DB sont les variables d'environnement DU CONTENEUR
+      # (définies juste au-dessus), pas une interpolation docker-compose -- elles restent
+      # donc justes même si DB_USER/DB_NAME sont surchargés dans .env.
+      test: ["CMD-SHELL", "pg_isready -U $$POSTGRES_USER -d $$POSTGRES_DB"]
       interval: 5s
       timeout: 5s
       retries: 5
