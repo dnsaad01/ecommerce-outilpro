@@ -1,7 +1,10 @@
+import { useEffect, useState } from 'react';
 import { Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import Navbar from './components/Navbar';
 import Footer from './components/Footer';
 import HomePage from './pages/HomePage';
+import MaintenancePage from './pages/MaintenancePage';
+import configApi from './api/config';
 import CataloguePage from './pages/CataloguePage';
 import ProduitDetailPage from './pages/ProduitDetailPage';
 import CartPage from './pages/CartPage';
@@ -36,6 +39,22 @@ function App() {
     // La Navbar publique (site vitrine) n'a rien à faire dans l'espace admin,
     // qui a déjà son propre layout avec sidebar (AdminLayout).
     const estEspaceAdmin = location.pathname.startsWith('/admin');
+
+    // Mode maintenance : appelé une seule fois au montage, jamais pour l'espace admin
+    // (qui doit rester accessible même quand le site public est en maintenance, pour
+    // continuer à gérer le catalogue -- voir api/config.js et ConfigController côté
+    // backend). maintenanceActif reste 'false' tant que la réponse n'est pas arrivée,
+    // pour ne pas bloquer l'affichage du site en cas de lenteur/échec de cet appel.
+    const [maintenanceActif, setMaintenanceActif] = useState(false);
+    useEffect(() => {
+        configApi.get()
+            .then((config) => setMaintenanceActif(Boolean(config.maintenanceMode)))
+            .catch(() => setMaintenanceActif(false));
+    }, []);
+
+    if (maintenanceActif && !estEspaceAdmin) {
+        return <MaintenancePage />;
+    }
 
     return (
         <div className="min-h-screen bg-gray-50 flex flex-col">
