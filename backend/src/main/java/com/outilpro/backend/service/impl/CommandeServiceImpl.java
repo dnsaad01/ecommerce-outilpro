@@ -129,6 +129,16 @@ public class CommandeServiceImpl implements CommandeService {
         return toResponse(commandeRepository.save(commande));
     }
 
+    @Override
+    public void delete(Long id) {
+        // Suppression definitive reservee a ADMIN (voir CommandeController) : utile pour
+        // nettoyer des commandes de test, mais a eviter en usage normal -- le statut
+        // ANNULEE est prefere pour une vraie commande client (garde une trace/historique).
+        // Le stock n'est PAS restitue automatiquement : la suppression ici sert a effacer
+        // une commande erronee/de test, pas a "annuler proprement" une commande reelle.
+        commandeRepository.delete(getCommandeOuThrow(id));
+    }
+
     private Commande getCommandeOuThrow(Long id) {
         return commandeRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Commande introuvable, id=" + id));

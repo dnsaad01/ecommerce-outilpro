@@ -1,7 +1,7 @@
 import { Fragment, useEffect, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import commandeApi from '../../api/commandes';
-import { IconChevronDown } from '../../components/admin/icons';
+import { IconChevronDown, IconTrash } from '../../components/admin/icons';
 
 const STATUTS = ['EN_ATTENTE', 'VALIDEE', 'LIVREE', 'ANNULEE'];
 
@@ -33,6 +33,7 @@ function CommandesPage() {
     const [erreur, setErreur] = useState(null);
     const [ligneOuverte, setLigneOuverte] = useState(null); // id de la commande dont le détail est déplié
     const [enCoursMaj, setEnCoursMaj] = useState(null); // id de la commande en train de changer de statut
+    const [enCoursSuppression, setEnCoursSuppression] = useState(null); // id de la commande en train d'etre supprimee
 
     useEffect(() => {
         async function chargerCommandes() {
@@ -73,6 +74,29 @@ function CommandesPage() {
             console.error(err);
         } finally {
             setEnCoursMaj(null);
+        }
+    }
+
+    // Suppression definitive : reservee aux commandes de test/erronees. Pour une vraie
+    // commande client, preferer "Annulee" (changerStatut) qui garde une trace.
+    async function supprimer(commande) {
+        if (!window.confirm(`Supprimer definitivement la commande de "${commande.nomClient}" (${commande.total.toFixed(2)} DH) ? Cette action est irreversible.`)) {
+            return;
+        }
+        setEnCoursSuppression(commande.id);
+        try {
+            await commandeApi.delete(commande.id);
+            setPageData((prev) => ({
+                ...prev,
+                content: prev.content.filter((c) => c.id !== commande.id),
+                totalElements: prev.totalElements - 1,
+            }));
+            if (ligneOuverte === commande.id) setLigneOuverte(null);
+        } catch (err) {
+            alert("Impossible de supprimer cette commande.");
+            console.error(err);
+        } finally {
+            setEnCoursSuppression(null);
         }
     }
 
@@ -145,17 +169,27 @@ function CommandesPage() {
                                                 {formaterDate(commande.dateCreation)}
                                             </td>
                                             <td className="px-4 py-3 text-right">
-                                                <button
-                                                    onClick={() => setLigneOuverte(ligneOuverte === commande.id ? null : commande.id)}
-                                                    title={ligneOuverte === commande.id ? 'Masquer les détails' : 'Voir les détails'}
-                                                    className="inline-flex items-center justify-center w-8 h-8 rounded-full bg-gray-100 text-gray-500 transition-all duration-150 hover:bg-gray-200 hover:text-gray-900"
-                                                >
-                                                    <IconChevronDown
-                                                        className={`w-4 h-4 transition-transform duration-200 ${
-                                                            ligneOuverte === commande.id ? 'rotate-180' : ''
-                                                        }`}
-                                                    />
-                                                </button>
+                                                <div className="flex items-center justify-end gap-1.5">
+                                                    <button
+                                                        onClick={() => supprimer(commande)}
+                                                        disabled={enCoursSuppression === commande.id}
+                                                        title="Supprimer définitivement cette commande"
+                                                        className="inline-flex items-center justify-center w-8 h-8 rounded-full bg-gray-100 text-gray-500 transition-all duration-150 hover:bg-red-100 hover:text-red-600 disabled:opacity-50"
+                                                    >
+                                                        <IconTrash className="w-3.5 h-3.5" />
+                                                    </button>
+                                                    <button
+                                                        onClick={() => setLigneOuverte(ligneOuverte === commande.id ? null : commande.id)}
+                                                        title={ligneOuverte === commande.id ? 'Masquer les détails' : 'Voir les détails'}
+                                                        className="inline-flex items-center justify-center w-8 h-8 rounded-full bg-gray-100 text-gray-500 transition-all duration-150 hover:bg-gray-200 hover:text-gray-900"
+                                                    >
+                                                        <IconChevronDown
+                                                            className={`w-4 h-4 transition-transform duration-200 ${
+                                                                ligneOuverte === commande.id ? 'rotate-180' : ''
+                                                            }`}
+                                                        />
+                                                    </button>
+                                                </div>
                                             </td>
                                         </tr>
                                         {ligneOuverte === commande.id && (

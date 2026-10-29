@@ -13,6 +13,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -44,5 +45,16 @@ public class CommandeController {
     public ResponseEntity<CommandeResponse> changerStatut(@PathVariable Long id,
                                                           @Valid @RequestBody ChangerStatutRequest request) {
         return ResponseEntity.ok(commandeService.changerStatut(id, request.getStatut()));
+    }
+
+    // Suppression definitive reservee a ADMIN -- voir le commentaire dans
+    // CommandeServiceImpl.delete() : prevue pour nettoyer des commandes de test,
+    // le statut ANNULEE (changerStatut ci-dessus) reste la bonne pratique pour une
+    // vraie commande client, afin de garder une trace.
+    @PreAuthorize("hasRole('ADMIN')")
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> delete(@PathVariable Long id) {
+        commandeService.delete(id);
+        return ResponseEntity.noContent().build();
     }
 }

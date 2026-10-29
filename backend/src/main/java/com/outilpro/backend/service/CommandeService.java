@@ -11,4 +11,5 @@ public interface CommandeService {
     CommandeResponse findById(Long id);
     CommandeResponse create(CommandeRequest request);
     CommandeResponse changerStatut(Long id, StatutCommande nouveauStatut);
+    void delete(Long id);
 }

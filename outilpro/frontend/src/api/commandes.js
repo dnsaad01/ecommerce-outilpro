@@ -5,6 +5,7 @@ const commandeApi = {
     // params attendus : { page, size, statut } — statut peut être omis (undefined) pour "tous les statuts"
     getAll: (params) => api.get('/commandes', { params }).then((res) => res.data),
     changerStatut: (id, statut) => api.patch(`/commandes/${id}/statut`, { statut }).then((res) => res.data),
+    delete: (id) => api.delete(`/commandes/${id}`).then((res) => res.data),
 };
 
 export default commandeApi;
