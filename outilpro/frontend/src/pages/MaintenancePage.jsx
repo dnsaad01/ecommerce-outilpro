@@ -1,10 +1,11 @@
-import { Link } from 'react-router-dom';
 import { Logo } from '../components/Logo';
 
 /**
  * Page affichée à la place de tout le site public quand le mode maintenance est
  * actif (voir App.jsx + api/config.js). L'espace admin (/admin/**) n'est jamais
  * concerné par cette page -- App.jsx ne la rend que pour les routes publiques.
+ * Pas de lien vers /admin/login ici : l'équipe connaît déjà l'URL, inutile de
+ * l'afficher publiquement.
  */
 function MaintenancePage() {
     return (
@@ -14,12 +15,6 @@ function MaintenancePage() {
             <p className="text-gray-500 max-w-md">
                 Nous mettons à jour notre catalogue. Le site sera de nouveau disponible très bientôt, merci de votre patience !
             </p>
-            <Link
-                to="/admin/login"
-                className="mt-8 text-xs text-gray-300 hover:text-gray-400 transition-colors duration-150"
-            >
-                Accès équipe
-            </Link>
         </div>
     );
 }
