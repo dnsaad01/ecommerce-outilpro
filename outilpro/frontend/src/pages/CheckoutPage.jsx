@@ -1,9 +1,10 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Navigate, useNavigate } from 'react-router-dom';
 import { useCart } from '../context/CartContext';
 import { usePromoReduction } from '../hooks/usePromoReduction';
 import { useLanguage } from '../context/LanguageContext';
 import commandeApi from '../api/commandes';
+import { trackInitiateCheckout, trackPurchase } from '../lib/metaPixel';
 
 // Liste fermée (triée par ordre alphabétique du nom français, pour un ordre stable quelle
 // que soit la langue d'affichage) des principales villes et préfectures du Maroc pour le
@@ -92,6 +93,15 @@ function CheckoutPage() {
     const [commandeConfirmee, setCommandeConfirmee] = useState(null);
     const navigate = useNavigate();
 
+    // Une seule fois à l'arrivée sur la page (pas à chaque re-render) : signale à Meta
+    // qu'un client a commencé le paiement, avec le panier tel qu'il est à ce moment-là.
+    useEffect(() => {
+        if (articles.length > 0) {
+            trackInitiateCheckout(articles, totalPrix);
+        }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []);
+
     // Livraison toujours gratuite, quelle que soit la ville : aucun frais n'est calculé.
     // La ville reste demandée au client (simple champ, pas de tarification) pour que
     // l'admin sache où expédier la commande.
@@ -113,6 +123,7 @@ function CheckoutPage() {
         setEnvoiEnCours(true);
         try {
             const commande = await commandeApi.create(payload);
+            trackPurchase(commande);
             setCommandeConfirmee(commande);
             viderPanier();
         } catch (err) {

@@ -5,6 +5,7 @@ import { useCart } from '../context/CartContext';
 import { useLanguage } from '../context/LanguageContext';
 import ProduitCard from '../components/ProduitCard';
 import ImagePlaceholder from '../components/ImagePlaceholder';
+import { trackViewContent } from '../lib/metaPixel';
 
 function IconChevronRight({ className }) {
     return (
@@ -41,6 +42,7 @@ function ProduitDetailPage() {
                 const data = await produitApi.getById(id);
                 if (annule) return;
                 setProduit(data);
+                trackViewContent(data);
 
                 // Produits similaires : même catégorie, sans le produit courant, 4 max.
                 // Le catalogue public n'a pas d'endpoint dédié "produits liés" — on réutilise

@@ -11,6 +11,11 @@ COPY . .
 ARG VITE_API_URL
 ENV VITE_API_URL=$VITE_API_URL
 
+# ID du Pixel Meta (Facebook Ads) -- optionnel : si non fourni, le suivi Facebook Ads
+# est simplement desactive (voir src/lib/metaPixel.js), le site fonctionne quand meme.
+ARG VITE_FACEBOOK_PIXEL_ID
+ENV VITE_FACEBOOK_PIXEL_ID=$VITE_FACEBOOK_PIXEL_ID
+
 RUN npm run build
 
 # ---- Etape 2 : service via Nginx ----

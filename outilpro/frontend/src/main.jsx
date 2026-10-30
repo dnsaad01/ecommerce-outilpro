@@ -6,7 +6,9 @@ import { CartProvider } from './context/CartContext.jsx';
 import { LanguageProvider } from './context/LanguageContext.jsx';
 import './index.css';
 import { AuthProvider } from "./context/AuthContext";
+import { initMetaPixel } from './lib/metaPixel';
 
+initMetaPixel();
 
 createRoot(document.getElementById('root')).render(
     <StrictMode>

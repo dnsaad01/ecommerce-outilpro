@@ -5,6 +5,7 @@ import Footer from './components/Footer';
 import HomePage from './pages/HomePage';
 import MaintenancePage from './pages/MaintenancePage';
 import configApi from './api/config';
+import { trackPageView } from './lib/metaPixel';
 import CataloguePage from './pages/CataloguePage';
 import ProduitDetailPage from './pages/ProduitDetailPage';
 import CartPage from './pages/CartPage';
@@ -51,6 +52,14 @@ function App() {
             .then((config) => setMaintenanceActif(Boolean(config.maintenanceMode)))
             .catch(() => setMaintenanceActif(false));
     }, []);
+
+    // Suivi Meta Pixel (Facebook Ads) : une app React est une SPA, donc une navigation
+    // interne ne recharge jamais la page -- sans cet effet, le Pixel ne verrait que la
+    // toute première page ouverte et jamais les suivantes. Se déclenche aussi au tout
+    // premier rendu (pathname/search ont bien une valeur dès le départ).
+    useEffect(() => {
+        trackPageView();
+    }, [location.pathname, location.search]);
 
     if (maintenanceActif && !estEspaceAdmin) {
         return <MaintenancePage />;

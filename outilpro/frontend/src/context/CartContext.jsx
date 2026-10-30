@@ -1,4 +1,5 @@
 import { createContext, useContext, useEffect, useState } from 'react';
+import { trackAddToCart } from '../lib/metaPixel';
 
 const CartContext = createContext(null);
 
@@ -39,6 +40,7 @@ export function CartProvider({ children }) {
     }, [codePromo]);
 
     function ajouterAuPanier(produit, quantite = 1) {
+        trackAddToCart(produit, quantite);
         setArticles((precedent) => {
             const existant = precedent.find((a) => a.produitId === produit.id);
             if (existant) {
