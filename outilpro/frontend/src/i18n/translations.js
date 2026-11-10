@@ -182,7 +182,7 @@ export const traductions = {
         verificationCode: 'كي نتحقق من الكود...',
         retirer: 'حذف',
         codeApplique: 'الكود "{{code}}" مطبق',
-        sousTotal: 'المجموع الفرعي',
+        sousTotal: 'الثمن ديال المنتوجات',
         reduction: 'التخفيض',
         totalHorsLivraison: 'المجموع (التوصيل مجاني)',
         passerCommande: 'تأكيد الطلب',
