@@ -75,7 +75,7 @@ export const traductions = {
         codeApplique: 'Code "{{code}}" appliqué',
         sousTotal: 'Sous-total',
         reduction: 'Réduction',
-        totalHorsLivraison: 'Total (hors livraison)',
+        totalHorsLivraison: 'Total (livraison gratuite)',
         passerCommande: 'Passer la commande',
         supprimer: 'Supprimer',
 
@@ -184,7 +184,7 @@ export const traductions = {
         codeApplique: 'الكود "{{code}}" مطبق',
         sousTotal: 'المجموع الفرعي',
         reduction: 'التخفيض',
-        totalHorsLivraison: 'المجموع (بلا التوصيل)',
+        totalHorsLivraison: 'المجموع (التوصيل مجاني)',
         passerCommande: 'تأكيد الطلب',
         supprimer: 'حذف',
 
