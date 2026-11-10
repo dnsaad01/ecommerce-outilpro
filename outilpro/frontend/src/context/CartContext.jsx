@@ -4,6 +4,8 @@ import { trackAddToCart } from '../lib/metaPixel';
 const CartContext = createContext(null);
 
 const CLE_STOCKAGE_PANIER = 'outilpro_panier';
+// Limite volontaire : pas de grosse commande en un clic sur un seul produit (ex: 50 unités).
+export const QUANTITE_MAX_PAR_PRODUIT = 5;
 const CLE_STOCKAGE_PROMO = 'outilpro_code_promo';
 
 function chargerPanierInitial() {
@@ -45,7 +47,9 @@ export function CartProvider({ children }) {
             const existant = precedent.find((a) => a.produitId === produit.id);
             if (existant) {
                 return precedent.map((a) =>
-                    a.produitId === produit.id ? { ...a, quantite: a.quantite + quantite } : a
+                    a.produitId === produit.id
+                        ? { ...a, quantite: Math.min(a.quantite + quantite, QUANTITE_MAX_PAR_PRODUIT) }
+                        : a
                 );
             }
             // On stocke le prix EFFECTIF (promo si actif, sinon prix normal) — c'est aussi
@@ -53,7 +57,14 @@ export function CartProvider({ children }) {
             const prixUnitaire = produit.prixEffectif ?? produit.prix;
             return [
                 ...precedent,
-                { produitId: produit.id, nom: produit.nom, prix: prixUnitaire, imageUrl: produit.imageUrl, sku: produit.sku, quantite },
+                {
+                    produitId: produit.id,
+                    nom: produit.nom,
+                    prix: prixUnitaire,
+                    imageUrl: produit.imageUrl,
+                    sku: produit.sku,
+                    quantite: Math.min(quantite, QUANTITE_MAX_PAR_PRODUIT),
+                },
             ];
         });
     }
@@ -63,8 +74,9 @@ export function CartProvider({ children }) {
             supprimerDuPanier(produitId);
             return;
         }
+        const quantiteLimitee = Math.min(quantite, QUANTITE_MAX_PAR_PRODUIT);
         setArticles((precedent) =>
-            precedent.map((a) => (a.produitId === produitId ? { ...a, quantite } : a))
+            precedent.map((a) => (a.produitId === produitId ? { ...a, quantite: quantiteLimitee } : a))
         );
     }
 

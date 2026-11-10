@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { useCart } from '../context/CartContext';
+import { useCart, QUANTITE_MAX_PAR_PRODUIT } from '../context/CartContext';
 import { usePromoReduction } from '../hooks/usePromoReduction';
 import { useLanguage } from '../context/LanguageContext';
 
@@ -60,7 +60,8 @@ function CartPage() {
                                 <span className="w-8 text-center">{article.quantite}</span>
                                 <button
                                     onClick={() => modifierQuantite(article.produitId, article.quantite + 1)}
-                                    className="w-9 h-9 flex items-center justify-center border border-gray-300 rounded text-lg hover:bg-gray-50"
+                                    disabled={article.quantite >= QUANTITE_MAX_PAR_PRODUIT}
+                                    className="w-9 h-9 flex items-center justify-center border border-gray-300 rounded text-lg hover:bg-gray-50 disabled:opacity-40 disabled:cursor-not-allowed"
                                 >
                                     +
                                 </button>

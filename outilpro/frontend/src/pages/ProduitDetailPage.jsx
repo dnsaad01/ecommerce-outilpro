@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import produitApi from '../api/produits';
-import { useCart } from '../context/CartContext';
+import { useCart, QUANTITE_MAX_PAR_PRODUIT } from '../context/CartContext';
 import { useLanguage } from '../context/LanguageContext';
 import ProduitCard from '../components/ProduitCard';
 import ImagePlaceholder from '../components/ImagePlaceholder';
@@ -87,7 +87,7 @@ function ProduitDetailPage() {
         ? Math.round((1 - produit.prixEffectif / produit.prix) * 100)
         : 0;
     const enStock = produit.stock > 0;
-    const quantiteMax = Math.max(produit.stock, 1);
+    const quantiteMax = Math.min(Math.max(produit.stock, 1), QUANTITE_MAX_PAR_PRODUIT);
 
     // Couverture (imageUrl) en premier, puis les photos supplementaires -- Boolean filtre
     // un imageUrl vide/null sans casser l'ordre des suivantes.

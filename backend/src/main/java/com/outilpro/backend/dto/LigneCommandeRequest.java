@@ -1,5 +1,6 @@
 package com.outilpro.backend.dto;
 
+import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
 import lombok.Getter;
@@ -14,5 +15,6 @@ public class LigneCommandeRequest {
 
     @NotNull(message = "La quantité est obligatoire")
     @Positive(message = "La quantité doit être supérieure à 0")
+    @Max(value = 5, message = "La quantité maximale par produit est de 5")
     private Integer quantite;
 }
