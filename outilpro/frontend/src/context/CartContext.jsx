@@ -11,7 +11,13 @@ const CLE_STOCKAGE_PROMO = 'outilpro_code_promo';
 function chargerPanierInitial() {
     try {
         const donnees = localStorage.getItem(CLE_STOCKAGE_PANIER);
-        return donnees ? JSON.parse(donnees) : [];
+        const articles = donnees ? JSON.parse(donnees) : [];
+        // Ramène aussi les paniers déjà enregistrés (avant l'ajout de cette limite)
+        // à la quantité maximale autorisée.
+        return articles.map((a) => ({
+            ...a,
+            quantite: Math.min(a.quantite, QUANTITE_MAX_PAR_PRODUIT),
+        }));
     } catch {
         return [];
     }
