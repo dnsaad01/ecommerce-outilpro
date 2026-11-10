@@ -206,7 +206,7 @@ export const traductions = {
         merciMessage: 'شكراً {{nom}}، الطلب رقم #{{id}} تسجل. غادي نتصلو بيك على {{tel}} لتأكيد التوصيل.',
         retourAccueil: 'الرجوع للرئيسية',
         erreurCommandeGenerique: 'وقع خطأ فتسجيل الطلب.',
-        telephoneInvalide: 'رقم الهاتف خايب (خاصو يكون رقم مغربي، مثال: 0612345678)',
+        telephoneInvalide: 'رقم الهاتف خاطئ (خاصو يكون رقم مغربي، مثال: 0612345678)',
 
         // MarquesPage
         aucuneMarque: 'ماكاين حتى ماركة دابا.',
