@@ -107,9 +107,19 @@ function CheckoutPage() {
     // l'admin sache où expédier la commande.
     const totalFinal = Math.max(0, totalPrix - reduction);
 
+    // Même règle que le backend (@Pattern sur CommandeRequest.telephoneClient) : on la
+    // reproduit ici pour pouvoir afficher tout de suite un message traduit, au lieu
+    // d'attendre un aller-retour serveur dont le message n'est garanti qu'en français.
+    const REGEX_TELEPHONE_MAROCAIN = /^(?:\+212|0)[\s.-]?[5-7](?:[\s.-]?[0-9]){8}$/;
+
     async function soumettreCommande(e) {
         e.preventDefault();
         setErreur(null);
+
+        if (!REGEX_TELEPHONE_MAROCAIN.test(telephoneClient.trim())) {
+            setErreur(t('telephoneInvalide'));
+            return;
+        }
 
         const payload = {
             nomClient,

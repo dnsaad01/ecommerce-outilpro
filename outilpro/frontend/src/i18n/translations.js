@@ -96,6 +96,7 @@ export const traductions = {
         merciMessage: 'Merci {{nom}}, ta commande #{{id}} a été enregistrée. Notre équipe te contactera au {{tel}} pour confirmer la livraison.',
         retourAccueil: "Retour à l'accueil",
         erreurCommandeGenerique: 'Une erreur est survenue lors de la création de la commande.',
+        telephoneInvalide: 'Numéro de téléphone invalide (format marocain attendu, ex: 0612345678)',
 
         // MarquesPage
         aucuneMarque: 'Aucune marque disponible pour le moment.',
@@ -205,6 +206,7 @@ export const traductions = {
         merciMessage: 'شكراً {{nom}}، الطلب رقم #{{id}} تسجل. غادي نتصلو بيك على {{tel}} لتأكيد التوصيل.',
         retourAccueil: 'الرجوع للرئيسية',
         erreurCommandeGenerique: 'وقع خطأ فتسجيل الطلب.',
+        telephoneInvalide: 'رقم الهاتف خايب (خاصو يكون رقم مغربي، مثال: 0612345678)',
 
         // MarquesPage
         aucuneMarque: 'ماكاين حتى ماركة دابا.',
