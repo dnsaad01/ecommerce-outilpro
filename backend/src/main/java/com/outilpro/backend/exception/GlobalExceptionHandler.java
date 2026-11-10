@@ -58,9 +58,15 @@ public class GlobalExceptionHandler {
         for (FieldError fieldError : ex.getBindingResult().getFieldErrors()) {
             erreurs.put(fieldError.getField(), fieldError.getDefaultMessage());
         }
+        // Le frontend lit toujours err.response?.data?.message (comme pour toutes les autres
+        // erreurs ci-dessus) — sans ce champ, une erreur de validation (ex: téléphone invalide)
+        // retombait silencieusement sur le message générique "Une erreur est survenue...", sans
+        // jamais dire au client CE QUI est invalide dans son formulaire.
+        String message = String.join(" ", erreurs.values());
         Map<String, Object> body = new HashMap<>();
         body.put("timestamp", LocalDateTime.now());
         body.put("status", HttpStatus.BAD_REQUEST.value());
+        body.put("message", message);
         body.put("erreurs", erreurs);
         return ResponseEntity.badRequest().body(body);
     }
