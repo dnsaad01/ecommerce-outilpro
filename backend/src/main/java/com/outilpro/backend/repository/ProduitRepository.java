@@ -40,7 +40,8 @@ public interface ProduitRepository extends JpaRepository<Produit, Long> {
     // du Sort fourni ; les propriétés y sont préfixées par l'alias "p." pour éviter toute
     // ambiguïté avec les colonnes "nom" de Categorie/Marque une fois la jointure implicite faite.
     @Query("SELECT p FROM Produit p " +
-            "WHERE (:categorieId IS NULL OR p.categorie.id = :categorieId) " +
+            "WHERE p.actif = TRUE " +
+            "AND (:categorieId IS NULL OR p.categorie.id = :categorieId) " +
             "AND (:marqueId IS NULL OR p.marque.id = :marqueId) " +
             "AND (:recherche IS NULL OR LOWER(p.nom) LIKE LOWER(CAST(:recherche AS string))) " +
             "AND (:enStockUniquement = FALSE OR p.stock > 0)")

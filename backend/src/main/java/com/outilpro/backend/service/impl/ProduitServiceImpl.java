@@ -14,6 +14,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -33,7 +35,22 @@ public class ProduitServiceImpl implements ProduitService {
     @Override
     @Transactional(readOnly = true)
     public ProduitResponse findById(Long id) {
-        return toResponse(getProduitOuThrow(id));
+        Produit produit = getProduitOuThrow(id);
+        if (!produit.isActif() && !estPersonnelConnecte()) {
+            // Même exception que "id inconnu" : un produit masqué ne doit pas se distinguer
+            // d'un produit inexistant pour un visiteur qui devine/parcourt des id.
+            throw new ResourceNotFoundException("Produit introuvable, id=" + id);
+        }
+        return toResponse(produit);
+    }
+
+    private boolean estPersonnelConnecte() {
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        if (auth == null || !auth.isAuthenticated()) {
+            return false;
+        }
+        return auth.getAuthorities().stream()
+                .anyMatch(a -> a.getAuthority().equals("ROLE_ADMIN") || a.getAuthority().equals("ROLE_EMPLOYE"));
     }
 
     @Override
@@ -81,6 +98,7 @@ public class ProduitServiceImpl implements ProduitService {
                 .sku(request.getSku())
                 .categorie(categorie)
                 .marque(marque)
+                .actif(request.getActif() == null || request.getActif())
                 .build();
 
         return toResponse(produitRepository.save(produit));
@@ -114,6 +132,9 @@ public class ProduitServiceImpl implements ProduitService {
         produit.setSku(request.getSku());
         produit.setCategorie(categorie);
         produit.setMarque(marque);
+        if (request.getActif() != null) {
+            produit.setActif(request.getActif());
+        }
 
         return toResponse(produitRepository.save(produit));
     }
@@ -162,6 +183,7 @@ public class ProduitServiceImpl implements ProduitService {
                 .categorieNom(produit.getCategorie().getNom())
                 .marqueId(produit.getMarque().getId())
                 .marqueNom(produit.getMarque().getNom())
+                .actif(produit.isActif())
                 .build();
     }
 }

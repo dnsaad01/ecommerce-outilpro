@@ -22,6 +22,7 @@ const FORM_VIDE = {
     marqueId: '',
     imageUrl: '',
     imagesSupplementaires: [],
+    actif: true,
 };
 
 // Une carte produit : image cadrée en haut, infos essentielles en dessous.
@@ -50,6 +51,14 @@ function CarteProduit({ produit, onModifier, onSupprimer, onAjusterStock }) {
                 {produit.enPromotion && (
                     <span className="absolute top-2 left-2 text-xs font-semibold px-2 py-1 rounded-full bg-orange-600 text-white shadow-sm">
                         Promo
+                    </span>
+                )}
+
+                {/* Produit masqué : n'apparaît plus sur le site public (catalogue, fiche produit),
+                    mais reste visible et modifiable ici pour l'admin. */}
+                {produit.actif === false && (
+                    <span className="absolute bottom-2 left-2 text-xs font-semibold px-2 py-1 rounded-full bg-gray-800 text-white shadow-sm">
+                        Masqué
                     </span>
                 )}
 
@@ -211,6 +220,7 @@ function ProduitsPage() {
             marqueId: produit.marqueId,
             imageUrl: produit.imageUrl || '',
             imagesSupplementaires: produit.imagesSupplementaires || [],
+            actif: produit.actif !== false,
         });
         setErreurFormulaire(null);
         setFormOuvert(true);
@@ -237,6 +247,7 @@ function ProduitsPage() {
                 marqueId: parseInt(form.marqueId, 10),
                 imageUrl: form.imageUrl || null,
                 imagesSupplementaires: form.imagesSupplementaires,
+                actif: form.actif,
             };
 
             if (produitEnEdition) {
@@ -349,6 +360,22 @@ function ProduitsPage() {
                             className="w-full border rounded px-3 py-2"
                         />
                     </div>
+
+                    <label className="flex items-center gap-2 text-sm font-medium cursor-pointer">
+                        <input
+                            type="checkbox"
+                            checked={form.actif}
+                            onChange={(e) => setForm((f) => ({ ...f, actif: e.target.checked }))}
+                            className="w-4 h-4"
+                        />
+                        Produit visible sur le site
+                    </label>
+                    {!form.actif && (
+                        <p className="text-xs text-gray-500 -mt-2">
+                            Masqué : ce produit n'apparaîtra plus dans le catalogue ni sur sa fiche
+                            produit publique, mais reste conservé (stock, historique) et modifiable ici.
+                        </p>
+                    )}
 
                     <div className="grid grid-cols-2 gap-4">
                         <div>

@@ -52,4 +52,8 @@ public class ProduitRequest {
 
     @NotNull(message = "La marque est obligatoire")
     private Long marqueId;
+
+    // Optionnel : null = ne pas changer la visibilité actuelle à la modification, ou "visible"
+    // par défaut à la création (voir ProduitServiceImpl).
+    private Boolean actif;
 }

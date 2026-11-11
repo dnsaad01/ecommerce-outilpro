@@ -24,4 +24,5 @@ public class ProduitResponse {
     private String categorieNom;
     private Long marqueId;
     private String marqueNom;
+    private boolean actif;
 }

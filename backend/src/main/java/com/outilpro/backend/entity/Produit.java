@@ -55,6 +55,15 @@ public class Produit {
     @Column(nullable = false, unique = true)
     private String sku;
 
+    // Permet de masquer un produit du catalogue public (recherche, fiche produit) sans le
+    // supprimer : conserve son historique de commandes et son stock, contrairement à une
+    // suppression définitive. L'admin continue de le voir et de pouvoir le modifier.
+    // columnDefinition="boolean default true" : au déploiement de ce champ, les produits déjà
+    // en base (qui n'ont pas encore cette colonne) sont automatiquement considérés visibles.
+    @Column(nullable = false, columnDefinition = "boolean default true")
+    @Builder.Default
+    private boolean actif = true;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "categorie_id", nullable = false)
     private Categorie categorie;
